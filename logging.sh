@@ -12,5 +12,6 @@ mkdir $filename
 cd $filename
 gslink=gs://$bucket/*
 echo $gslink
-gsutil -m cp $gslink .
-
+gsutil -m cp -r $gslink .
+cd ..
+go run rdjunit.go $filename > $filename/output.txt
