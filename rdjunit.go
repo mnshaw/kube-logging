@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+// taken from contrib/e2e.go
 type Testcase struct {
 	Name      string `xml:"name,attr"`
 	ClassName string `xml:"classname,attr"`
@@ -20,7 +21,9 @@ type Testsuite struct {
 	Testcases []Testcase `xml:"testcase"`
 }
 
-
+// look for junit files in each of the folders for each image located
+// in the artifacts folder and call the functions for getting the 
+// information about each of the failed tests
 func main() {
 	pwd, _ := os.Getwd()
 	
@@ -29,7 +32,6 @@ func main() {
 
 	mapPodError := map[string]string{}
 	mapPodCont := map[string]string{}
-	
 
 	if len(images) != 0 {
 		for _, fp := range images {
@@ -43,18 +45,7 @@ func main() {
 				}
 			}
 		}
-	} else {
-		moreFiles := true
-		for i := 1; moreFiles; i++ {	
-			fp := fmt.Sprintf("%s/artifacts/junit_%02d.xml", os.Args[1], i)
-			_, err := os.Stat(filepath.Join(pwd, fp));
-			if err == nil {
-				getFailedPods(fp, mapPodError, mapPodCont)
-			} else {
-				moreFiles = false
-			}
-		}
-	}
+	} 
 
 	fmt.Println("mapPodError")
 	fmt.Println(mapPodError)
@@ -63,7 +54,8 @@ func main() {
 	fmt.Println(mapPodCont)
 }
 
-
+// from a junit xml file, populate the testsuite struct and extract
+// the failed pods and the containers they are associated with
 func getFailedPods(fp string, mapPodError map[string]string, mapPodCont map[string]string) ([]string){
 	testSuite := &Testsuite{}
 	

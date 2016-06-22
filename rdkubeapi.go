@@ -26,6 +26,8 @@ func timeToInt(timeStampString string) ([]int) {
 	return intStamp
 }
 
+// read through the kube-apiserver log and return the part of the log based
+// on the time the pod was mentioned in the kubelet log
 func rdKubeAPI(fp string, mapPodKubelet map[string]string) {
 	file, err := os.Open(fp + "/kube-apiserver.log")
 	check(err)
@@ -37,7 +39,6 @@ func rdKubeAPI(fp string, mapPodKubelet map[string]string) {
 	
 	for pod, kubelet := range mapPodKubelet {
 		splitKubelet := strings.Split(kubelet, "\n")	
-		//TODO: put the outer split into the timeToInt function
 		startTime := strings.Split(splitKubelet[1], " ")[1]
 		endTime := strings.Split(splitKubelet[len(splitKubelet) - 1], " ")[1]
 		podTimes[pod] = []string{startTime, endTime}
@@ -72,12 +73,12 @@ func rdKubeAPI(fp string, mapPodKubelet map[string]string) {
 		fmt.Println(log)
 		fmt.Println("---------------")
 	}
- 
 	fmt.Println("=================================")
 
 }
 
-
+// given a timestamp check if it is between a start and end time
+// TODO: put the calls to the timeToInt function in here instead
 func checkInChunk(timeNow []int, startTime []int, endTime []int) (bool) {
 	if (timeNow[0] >= startTime[0] && timeNow[0] <= endTime[0]) {
 		if (timeNow[1] >= startTime[1] && timeNow[1] <= endTime[1]) {
