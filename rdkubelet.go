@@ -13,11 +13,17 @@ func check(e error) {
         }
 }
 
+// given the filepath containing the kubelet log file and a slice
+// of the failed pods, returns a map of the pods to the relevant lines
+// which right now are all the lines containing the pod name 
+// TODO: add other filters/options like all the lines from when the pod
+// first appeared to when it dissappears, lines that contain container id, etc 
 func rdKubelet(fp string, pods []string) map[string]string{
 	file, err := os.Open(fp + "/kubelet.log")
 	check(err)
 	defer file.Close()
 
+	// mapPodKubelet: all the lines that contain the pod name
 	mapPodKubelet := map[string]string{}
 
 	scanner := bufio.NewScanner(file)
@@ -38,10 +44,10 @@ func rdKubelet(fp string, pods []string) map[string]string{
 	}
 	
 	for pod, lines := range mapPodKubelet {
-		fmt.Println("====================================")
+		fmt.Println("=================================")
 		fmt.Println("Kubelet log for pod:", pod)
 		fmt.Println(lines)
-		fmt.Println("====================================")
+		fmt.Println("=================================")
 	}
 
 	return mapPodKubelet
